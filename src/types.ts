@@ -75,6 +75,14 @@ export interface ComplexityReport {
   verdict: string;
 }
 
+export interface CodeRating {
+  fileName: string;
+  score: number;
+  strengths: string[];
+  weaknesses: string[];
+  verdict: string;
+}
+
 export interface CliOptions {
   explain?: boolean;
   roast?: boolean;

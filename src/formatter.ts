@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import type { FileMetrics, DirectorySummary, DiffResult, RiskAssessment, BlameResult, ComplexityReport } from './types.js';
+import type { FileMetrics, DirectorySummary, DiffResult, RiskAssessment, BlameResult, ComplexityReport, CodeRating } from './types.js';
 
 const DIVIDER = chalk.gray('─'.repeat(50));
 
@@ -409,6 +409,44 @@ export function formatSummary(metrics: FileMetrics, purpose: string): string {
   else verdict = 'looks decent.';
 
   out.push(chalk.bold.white(`  verdict: ${verdict}`));
+  out.push('');
+  out.push(DIVIDER);
+  return out.join('\n');
+}
+
+export function formatRating(rating: CodeRating): string {
+  const out: string[] = [];
+
+  out.push('');
+  out.push(chalk.bold.cyan(`  Code rating: ${rating.fileName}`));
+  out.push(DIVIDER);
+
+  const scoreColor = rating.score >= 7 ? chalk.green
+    : rating.score >= 4 ? chalk.yellow
+    : chalk.red;
+  out.push('');
+  out.push(scoreColor(`  ${rating.score.toFixed(1)} / 10`));
+
+  if (rating.strengths.length > 0) {
+    out.push('');
+    out.push(chalk.bold.white('  strengths:'));
+    for (const s of rating.strengths) {
+      out.push(chalk.green(`    • ${s}`));
+    }
+  }
+
+  if (rating.weaknesses.length > 0) {
+    out.push('');
+    out.push(chalk.bold.white('  weaknesses:'));
+    for (const w of rating.weaknesses) {
+      out.push(chalk.red(`    • ${w}`));
+    }
+  }
+
+  out.push('');
+  out.push(chalk.bold.white('  verdict:'));
+  out.push(chalk.italic.gray(`    ${rating.verdict}`));
+
   out.push('');
   out.push(DIVIDER);
   return out.join('\n');

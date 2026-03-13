@@ -6,6 +6,7 @@ import { analyzeFile, analyzeDirectory, guessPurpose, guessSteps } from './analy
 import { readGitDiff, guessDiffPurpose } from './diff.js';
 import { readGitBlame } from './blame.js';
 import { analyzeComplexity } from './complexity.js';
+import { rateCode } from './rating.js';
 import {
   generateGreentext, generateRoast, generateDevNote,
   generateDiffCommentary, getDiffRisk, generateBlameCommentary,
@@ -14,7 +15,7 @@ import {
 import {
   formatFileAnalysis, formatExplain, formatRoast, formatDirectory,
   formatDiff, formatBlame, formatComplexity, formatProject,
-  formatTherapy, formatSummary, formatJson,
+  formatTherapy, formatSummary, formatRating, formatJson,
 } from './formatter.js';
 import type { CliOptions } from './types.js';
 
@@ -79,6 +80,14 @@ export function run(): void {
     .option('--max-files <n>', 'max files to analyze', '100')
     .action(async (options: CliOptions) => {
       await handleProject(options);
+    });
+
+  program
+    .command('rate <file>')
+    .description('rate a file from 0 to 10')
+    .option('--json', 'output raw JSON')
+    .action((file: string, options: CliOptions) => {
+      handleRate(file, options);
     });
 
   program.parse();
@@ -221,4 +230,24 @@ async function handleProject(options: CliOptions): Promise<void> {
 
   const commentary = generateProjectComment(summary);
   console.log(formatProject(summary, commentary));
+}
+
+function handleRate(file: string, options: CliOptions): void {
+  const resolved = path.resolve(file);
+  if (!fs.existsSync(resolved)) {
+    console.error(`\n  Error: file not found — ${resolved}\n`);
+    process.exit(1);
+  }
+
+  const source = fs.readFileSync(resolved, 'utf-8');
+  const metrics = analyzeFile(resolved);
+  const { maxNesting } = analyzeComplexity(metrics, source);
+  const rating = rateCode(metrics, maxNesting);
+
+  if (options.json) {
+    console.log(formatJson(rating));
+    return;
+  }
+
+  console.log(formatRating(rating));
 }
