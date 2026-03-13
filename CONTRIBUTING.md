@@ -4,30 +4,47 @@ Thanks for considering contributing to **wtf-code**.
 
 ## Getting started
 
+1. Fork the repo on GitHub
+2. Clone your fork
+
 ```
-git clone https://github.com/ecx2f/wtf
+git clone https://github.com/YOUR_USERNAME/wtf
 cd wtf
 npm install
 npm run build
 ```
 
+3. Add the original repo as upstream
+
+```
+git remote add upstream https://github.com/ecx2f/wtf
+```
+
 ## Making changes
 
-1. Create a branch from `main`
+1. Make sure your fork is up to date
+
+```
+git fetch upstream
+git checkout main
+git merge upstream/main
+```
+
+2. Create a branch from `main`
 
 ```
 git checkout -b feat/your-feature
 ```
 
-2. Make your changes in `src/`
-3. Build and test
+3. Make your changes in `src/`
+4. Build and test
 
 ```
 npm run build
 node dist/bin/wtf.js examples/messy.js
 ```
 
-4. Commit using [conventional commits](https://www.conventionalcommits.org/)
+5. Commit using [conventional commits](https://www.conventionalcommits.org/)
 
 ```
 feat: add new command
@@ -37,11 +54,13 @@ refactor: simplify analyzer
 chore: update dependencies
 ```
 
-5. Push and open a pull request
+6. Push to your fork
 
 ```
 git push origin feat/your-feature
 ```
+
+7. Open a Pull Request from your fork to `ecx2f/wtf:main`
 
 ## What you can work on
 
