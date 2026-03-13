@@ -67,268 +67,6 @@ npm install -g wtf-code
 
 ---
 
-## Usage
-
-### Analyze a file
-
-```
-wtf file.js
-```
-
-```
-  Analyzing file: auth.js
-──────────────────────────────────────────────────
-
-  Purpose:
-  Handles user authentication.
-
-  Main components:
-    • function login()
-    • function verifyToken()
-    • class UserManager
-
-  Metrics:
-    Lines:     180
-    Functions: 12
-    Classes:   1
-    Imports:   3
-
-  Developer commentary:
-
-    > be dev
-    > open auth.js
-    > see 180 lines
-    > no comments
-    > pain
-
-    this file probably grew organically over time.
-
-──────────────────────────────────────────────────
-```
-
-### Roast mode
-
-```
-wtf messy.js --roast
-```
-
-```
-  🔥 Roasting: messy.js
-──────────────────────────────────────────────────
-
-    > be developer
-    > open messy.js
-    > see 180 lines
-    > no comments
-    > pain
-
-  function login()
-
-    this function works but nobody knows why.
-    variable naming confidence level: zero.
-
-    detected variable names:
-      data
-      data2
-      result
-      final
-      final_final
-
-──────────────────────────────────────────────────
-```
-
-### Blame mode
-
-```
-wtf blame auth.js
-```
-
-```
-  Analyzing contributions: auth.js
-──────────────────────────────────────────────────
-
-  Lines written by:
-    Andrew                 120  ████████████████████ 67%
-    Luna                    40  ██████ 22%
-    Unknown                 20  ███ 11%
-
-  Developer commentary:
-
-    > be Andrew
-    > add feature quickly
-    > promise to refactor later
-    > never refactor
-
-    classic.
-
-──────────────────────────────────────────────────
-```
-
-### Complexity analysis
-
-```
-wtf server.js --complexity
-```
-
-```
-  Complexity report: server.js
-──────────────────────────────────────────────────
-
-  Functions:              14
-  Average function length: 32 lines
-  Largest function:        processRequest() (97 lines)
-  Max nesting depth:       6
-
-  Warnings:
-    • deeply nested conditionals
-    • repeated vague variable naming
-
-  Verdict:
-    concerning
-
-  this function is doing way too much.
-
-──────────────────────────────────────────────────
-```
-
-### Project analysis
-
-```
-wtf project
-```
-
-```
-  Project analysis
-──────────────────────────────────────────────────
-
-  Files analyzed: 42
-
-  Largest file:
-    server.js (910 lines)
-
-  Total functions: 128
-  Total classes:   5
-  Average file length: 110 lines
-
-  Most common function names:
-    init (×4)
-    handleRequest (×3)
-    processData (×2)
-
-  Code smells detected:
-    • 3 large files (>300 lines)
-    • repeated vague variable naming
-
-  Developer commentary:
-
-    this project has strong "we'll refactor later" energy.
-
-──────────────────────────────────────────────────
-```
-
-### Therapy mode
-
-```
-wtf legacy.js --therapy
-```
-
-```
-  Therapy session for legacy.js
-──────────────────────────────────────────────────
-
-  You are not responsible for this code.
-  Take a deep breath.
-  We will get through this together.
-  It's okay to not understand legacy code.
-
-  The lack of comments is a systemic issue, not a personal one.
-
-  Session complete. You are valid.
-
-──────────────────────────────────────────────────
-```
-
-### Rate a file
-
-```
-wtf rate server.js
-```
-
-```
-  Code rating: server.js
-──────────────────────────────────────────────────
-
-  6.2 / 10
-
-  strengths:
-    • reasonable function count
-    • has comments
-    • focused module
-
-  weaknesses:
-    • large file
-    • vague variable names
-    • deeply nested logic
-
-  verdict:
-    functional but could be cleaner.
-
-──────────────────────────────────────────────────
-```
-
-### Quick summary
-
-```
-wtf file.js --summary
-```
-
-```
-  auth.js
-──────────────────────────────────────────────────
-
-  180 lines · 12 functions · 1 class
-
-  main job: handles user authentication
-
-  verdict: reasonable but messy.
-
-──────────────────────────────────────────────────
-```
-
-### Explain mode
-
-```
-wtf file.js --explain
-```
-
-Structured technical explanation with minimal humor.
-
-### Directory analysis
-
-```
-wtf src/
-```
-
-Analyze a directory of files.
-
-### Git diff explanation
-
-```
-wtf diff
-```
-
-Explains what a commit actually did.
-
-### JSON output
-
-```
-wtf file.js --json
-```
-
-Useful for automation.
-
----
-
 ## Commands
 
 | Command | Description |
@@ -336,43 +74,44 @@ Useful for automation.
 | `wtf <file>` | Analyze a file (default mode) |
 | `wtf <dir>` | Analyze a directory |
 | `wtf blame <file>` | See who wrote what |
+| `wtf rate <file>` | Rate a file from 0 to 10 |
 | `wtf diff` | Explain the current git diff |
 | `wtf project` | Full project analysis from cwd |
-| `wtf rate <file>` | Rate a file from 0 to 10 |
 
 ## Flags
 
 | Flag | Description |
 |------|-------------|
-| `--explain` | Structured explanation |
 | `--roast` | Full meme roast mode |
+| `--explain` | Structured explanation |
 | `--complexity` | Complexity analysis report |
 | `--therapy` | Emotional support for your code |
 | `--summary` | Short one-glance summary |
 | `--json` | Raw JSON output |
-| `--max-files <n>` | Max files analyzed in directory mode |
-| `--top <n>` | Show top N results |
+| `--max-files <n>` | Max files in directory mode |
+
+See [docs/commands.md](docs/commands.md) and [docs/flags.md](docs/flags.md) for full examples.
 
 ---
 
 ## How it works
 
-Written in TypeScript. Parses JavaScript using [Acorn](https://github.com/acornjs/acorn).
+Written in TypeScript. Analyzes JavaScript source files using [Acorn](https://github.com/acornjs/acorn).
 
-1. Walks the AST
-2. Extracts: functions, classes, imports, variable names
-3. Calculates code metrics and complexity
-4. Generates developer commentary using phrase pools
+1. Parses the AST
+2. Extracts functions, classes, imports, variable names
+3. Calculates code metrics, complexity, and nesting depth
+4. Generates developer commentary from internal phrase pools
 
-No AI involved. Just deterministic analysis and developer sarcasm.
+No AI involved. Fully deterministic. Fully offline.
 
 ---
 
-## Supported languages
+## Supported file types
 
-Currently: JavaScript (`.js` `.mjs` `.cjs` `.jsx`)
+Currently analyzes: JavaScript (`.js` `.mjs` `.cjs` `.jsx`)
 
-TypeScript support planned.
+TypeScript file analysis is planned.
 
 ---
 
@@ -386,7 +125,7 @@ npm run build
 npm link
 ```
 
-Now `wtf` is available globally from your local build.
+See [docs/development.md](docs/development.md) for project structure and details.
 
 ---
 
