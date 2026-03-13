@@ -129,6 +129,12 @@ See [docs/development.md](docs/development.md) for project structure and details
 
 ---
 
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+---
+
 ## License
 
 [MIT](./LICENSE)
