@@ -43,6 +43,35 @@ Structured technical explanation with minimal humor.
 wtf file.js --explain
 ```
 
+```
+  File: auth.js
+──────────────────────────────────────────────────
+
+  Purpose:
+  Handles user authentication.
+
+  Functions detected:
+    • login
+    • register
+    • verifyToken
+
+  Classes detected:
+    • UserManager
+
+  Execution flow:
+    1. Load dependencies
+    2. Validate input
+    3. Handle authentication
+
+  Metrics:
+    Lines:     180
+    Functions: 6
+    Classes:   1
+    Imports:   3
+
+──────────────────────────────────────────────────
+```
+
 ## `--complexity`
 
 Complexity analysis report.

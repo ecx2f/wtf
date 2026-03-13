@@ -47,6 +47,31 @@ Analyze a directory of files.
 wtf src/
 ```
 
+```
+  Project summary:
+──────────────────────────────────────────────────
+
+  Files analyzed: 8
+  Largest file: server.js (320 lines)
+  Total functions: 24
+  Total classes: 2
+
+  Most common function names:
+    • init (×3)
+    • handleRequest (×2)
+
+  Average file length: 95 lines
+
+  Possible issues:
+    • 1 large file (>300 lines)
+    • repeated vague variable naming
+
+──────────────────────────────────────────────────
+
+  Developer note:
+    this project has strong "deadline energy".
+```
+
 ## `wtf blame <file>`
 
 Analyze who wrote what using git blame.
@@ -82,6 +107,31 @@ Explains the current git diff.
 
 ```
 wtf diff
+```
+
+```
+  What happened here:
+──────────────────────────────────────────────────
+
+  Bug fix attempt.
+
+  Changes:
+    +45 lines
+    -12 lines
+    3 files changed
+
+  Files:
+    • src/auth.js
+    • src/utils.js
+    • test/auth.test.js
+
+  Risk level:
+    MODERATE
+    probably fine. probably.
+
+  developer attempted a fix. results inconclusive.
+
+──────────────────────────────────────────────────
 ```
 
 ## `wtf project`

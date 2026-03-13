@@ -46,23 +46,28 @@ wtf project
 ```
 wtf/
   bin/
-    wtf.ts              CLI entrypoint
+    wtf.ts                CLI entrypoint
   src/
-    cli.ts              Commander setup and command routing
-    analyzer.ts         File and directory analysis
-    metrics.ts          AST-based code metrics (Acorn)
-    complexity.ts       Nesting and complexity analysis
-    rating.ts           Code scoring (0-10)
-    blame.ts            Git blame parser
-    diff.ts             Git diff reader
-    humor.ts            Commentary and phrase pools
-    formatter.ts        Chalk-based terminal output
-    types.ts            Shared TypeScript interfaces
+    cli.ts                Commander setup and command routing
+    analyzer.ts           File and directory analysis
+    metrics.ts            AST-based code metrics (Acorn)
+    complexity.ts         Nesting and complexity analysis
+    rating.ts             Code scoring (0-10)
+    blame.ts              Git blame parser
+    diff.ts               Git diff reader
+    humor.ts              Commentary and phrase pools
+    formatter.ts          Chalk-based terminal output
+    types.ts              Shared TypeScript interfaces
   examples/
-    messy.js            Auth server example
-    legacy.js           Legacy HTTP server example
+    messy.js              Auth server example
+    legacy.js             Legacy HTTP server example
   docs/
-    commands.md         Command reference
-    flags.md            Flag reference
-    development.md      This file
+    commands.md           Command reference
+    flags.md              Flag reference
+    development.md        This file
+  CONTRIBUTING.md         Contribution guidelines
+  LICENSE                 MIT license
+  README.md
+  tsconfig.json
+  package.json
 ```
