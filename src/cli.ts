@@ -4,12 +4,19 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { analyzeFile, analyzeDirectory, guessPurpose, guessSteps } from './analyzer.js';
 import { readGitDiff, guessDiffPurpose } from './diff.js';
-import { generateGreentext, generateRoast, generateDevNote, generateDiffCommentary, getDiffRisk } from './humor.js';
+import { readGitBlame } from './blame.js';
+import { analyzeComplexity } from './complexity.js';
+import {
+  generateGreentext, generateRoast, generateDevNote,
+  generateDiffCommentary, getDiffRisk, generateBlameCommentary,
+  generateComplexityComment, generateProjectComment, generateTherapy,
+} from './humor.js';
 import {
   formatFileAnalysis, formatExplain, formatRoast, formatDirectory,
-  formatDiff, formatJson,
+  formatDiff, formatBlame, formatComplexity, formatProject,
+  formatTherapy, formatSummary, formatJson,
 } from './formatter.js';
-import type { CliOptions, DirectorySummary } from './types.js';
+import type { CliOptions } from './types.js';
 
 export function run(): void {
   const program = new Command();
@@ -21,6 +28,9 @@ export function run(): void {
     .argument('[path]', 'file or directory to analyze')
     .option('--explain', 'structured explanation without heavy jokes')
     .option('--roast', 'full meme roast mode')
+    .option('--complexity', 'complexity analysis report')
+    .option('--therapy', 'emotional support for your code')
+    .option('--summary', 'short one-glance summary')
     .option('--json', 'output raw JSON metrics')
     .option('--max-files <n>', 'max files to analyze in directory mode', '50')
     .option('--top <n>', 'show top N results', '5')
@@ -54,6 +64,23 @@ export function run(): void {
       handleDiff(options);
     });
 
+  program
+    .command('blame <file>')
+    .description('analyze who wrote the code')
+    .option('--json', 'output raw JSON')
+    .action((file: string, options: CliOptions) => {
+      handleBlame(file, options);
+    });
+
+  program
+    .command('project')
+    .description('full project analysis (runs from current directory)')
+    .option('--json', 'output raw JSON')
+    .option('--max-files <n>', 'max files to analyze', '100')
+    .action(async (options: CliOptions) => {
+      await handleProject(options);
+    });
+
   program.parse();
 }
 
@@ -64,6 +91,25 @@ function handleFile(filePath: string, options: CliOptions): void {
 
   if (options.json) {
     console.log(formatJson({ metrics, purpose, steps }));
+    return;
+  }
+
+  if (options.summary) {
+    console.log(formatSummary(metrics, purpose));
+    return;
+  }
+
+  if (options.therapy) {
+    const therapy = generateTherapy(metrics);
+    console.log(formatTherapy(metrics.fileName, therapy));
+    return;
+  }
+
+  if (options.complexity) {
+    const source = fs.readFileSync(path.resolve(filePath), 'utf-8');
+    const report = analyzeComplexity(metrics, source);
+    const comment = generateComplexityComment(report);
+    console.log(formatComplexity(report, comment));
     return;
   }
 
@@ -87,7 +133,7 @@ function handleFile(filePath: string, options: CliOptions): void {
 
 async function handleDirectory(dirPath: string, options: CliOptions): Promise<void> {
   const maxFiles = parseInt(options.maxFiles ?? '50', 10) || 50;
-  const summary: DirectorySummary = await analyzeDirectory(dirPath, maxFiles);
+  const summary = await analyzeDirectory(dirPath, maxFiles);
 
   if (options.json) {
     console.log(formatJson(summary));
@@ -135,4 +181,44 @@ function handleDiff(options: CliOptions): void {
   const commentary = generateDiffCommentary(diff);
 
   console.log(formatDiff(diff, purpose, risk, commentary));
+}
+
+function handleBlame(file: string, options: CliOptions): void {
+  const resolved = path.resolve(file);
+  if (!fs.existsSync(resolved)) {
+    console.error(`\n  Error: file not found — ${resolved}\n`);
+    process.exit(1);
+  }
+
+  const blame = readGitBlame(resolved);
+  if (!blame) {
+    console.log('\n  Could not read git blame. File may not be tracked.\n');
+    return;
+  }
+
+  if (options.json) {
+    console.log(formatJson(blame));
+    return;
+  }
+
+  const commentary = generateBlameCommentary(blame);
+  console.log(formatBlame(blame, commentary));
+}
+
+async function handleProject(options: CliOptions): Promise<void> {
+  const maxFiles = parseInt(options.maxFiles ?? '100', 10) || 100;
+  const summary = await analyzeDirectory(process.cwd(), maxFiles);
+
+  if (options.json) {
+    console.log(formatJson(summary));
+    return;
+  }
+
+  if (summary.totalFiles === 0) {
+    console.log('\n  No analyzable JavaScript/TypeScript files found.\n');
+    return;
+  }
+
+  const commentary = generateProjectComment(summary);
+  console.log(formatProject(summary, commentary));
 }

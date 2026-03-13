@@ -50,10 +50,38 @@ export interface RiskAssessment {
   comment: string;
 }
 
+export interface BlameAuthor {
+  name: string;
+  lines: number;
+  percent: number;
+}
+
+export interface BlameResult {
+  fileName: string;
+  totalLines: number;
+  authors: BlameAuthor[];
+  topAuthor: BlameAuthor | null;
+}
+
+export interface ComplexityReport {
+  fileName: string;
+  functionCount: number;
+  avgFunctionSize: number;
+  largestFunction: FunctionInfo | null;
+  longFunctions: FunctionInfo[];
+  maxNesting: number;
+  deeplyNestedLines: number;
+  warnings: string[];
+  verdict: string;
+}
+
 export interface CliOptions {
   explain?: boolean;
   roast?: boolean;
   json?: boolean;
+  complexity?: boolean;
+  therapy?: boolean;
+  summary?: boolean;
   maxFiles?: string;
   top?: string;
 }

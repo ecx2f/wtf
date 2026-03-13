@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import type { FileMetrics, DirectorySummary, DiffResult, RiskAssessment } from './types.js';
+import type { FileMetrics, DirectorySummary, DiffResult, RiskAssessment, BlameResult, ComplexityReport } from './types.js';
 
 const DIVIDER = chalk.gray('─'.repeat(50));
 
@@ -227,6 +227,188 @@ export function formatDiff(diff: DiffResult, purpose: string, risk: RiskAssessme
   out.push('');
   out.push(chalk.italic.gray(`  ${commentary}`));
 
+  out.push('');
+  out.push(DIVIDER);
+  return out.join('\n');
+}
+
+export function formatBlame(blame: BlameResult, commentary: string): string {
+  const out: string[] = [];
+
+  out.push('');
+  out.push(chalk.bold.cyan(`  Analyzing contributions: ${blame.fileName}`));
+  out.push(DIVIDER);
+
+  out.push('');
+  out.push(chalk.bold.white('  Lines written by:'));
+  for (const author of blame.authors.slice(0, 10)) {
+    const bar = chalk.green('█'.repeat(Math.max(1, Math.round(author.percent / 5))));
+    out.push(chalk.white(`    ${author.name.padEnd(20)} ${String(author.lines).padStart(5)}  ${bar} ${author.percent}%`));
+  }
+  if (blame.authors.length > 10) {
+    out.push(chalk.gray(`    ... and ${blame.authors.length - 10} more`));
+  }
+
+  if (commentary) {
+    out.push('');
+    out.push(chalk.bold.white('  Developer commentary:'));
+    out.push('');
+    for (const line of commentary.split('\n')) {
+      if (line.startsWith('>')) {
+        out.push(chalk.green(`    ${line}`));
+      } else if (line.trim() === '') {
+        out.push('');
+      } else {
+        out.push(chalk.italic.gray(`    ${line}`));
+      }
+    }
+  }
+
+  out.push('');
+  out.push(DIVIDER);
+  return out.join('\n');
+}
+
+export function formatComplexity(report: ComplexityReport, commentary: string): string {
+  const out: string[] = [];
+
+  out.push('');
+  out.push(chalk.bold.cyan(`  Complexity report: ${report.fileName}`));
+  out.push(DIVIDER);
+
+  out.push('');
+  out.push(chalk.white(`  Functions:              ${report.functionCount}`));
+  out.push(chalk.white(`  Average function length: ${report.avgFunctionSize} lines`));
+  if (report.largestFunction) {
+    out.push(chalk.white(`  Largest function:        ${report.largestFunction.name}() (${report.largestFunction.lines} lines)`));
+  }
+  out.push(chalk.white(`  Max nesting depth:       ${report.maxNesting}`));
+
+  if (report.longFunctions.length > 0) {
+    out.push('');
+    out.push(chalk.bold.white('  Long functions (>30 lines):'));
+    for (const fn of report.longFunctions.slice(0, 5)) {
+      out.push(chalk.yellow(`    • ${fn.name}() — ${fn.lines} lines`));
+    }
+  }
+
+  if (report.warnings.length > 0) {
+    out.push('');
+    out.push(chalk.bold.white('  Warnings:'));
+    for (const w of report.warnings) {
+      out.push(chalk.red(`    • ${w}`));
+    }
+  }
+
+  const verdictColor = report.verdict === 'chaotic' ? chalk.red
+    : report.verdict === 'concerning' ? chalk.yellow
+    : report.verdict === 'manageable' ? chalk.white
+    : chalk.green;
+  out.push('');
+  out.push(chalk.bold.white('  Verdict:'));
+  out.push(verdictColor(`    ${report.verdict}`));
+
+  out.push('');
+  out.push(chalk.italic.gray(`  ${commentary}`));
+
+  out.push('');
+  out.push(DIVIDER);
+  return out.join('\n');
+}
+
+export function formatProject(summary: DirectorySummary, commentary: string): string {
+  const out: string[] = [];
+
+  out.push('');
+  out.push(chalk.bold.cyan('  Project analysis'));
+  out.push(DIVIDER);
+
+  out.push('');
+  out.push(chalk.white(`  Files analyzed: ${summary.totalFiles}`));
+
+  if (summary.largest) {
+    out.push('');
+    out.push(chalk.bold.white('  Largest file:'));
+    out.push(chalk.white(`    ${summary.largest.name} (${summary.largest.lines} lines)`));
+  }
+
+  out.push('');
+  out.push(chalk.white(`  Total functions: ${summary.totalFunctions}`));
+  out.push(chalk.white(`  Total classes:   ${summary.totalClasses}`));
+  out.push(chalk.white(`  Average file length: ${summary.avgLines} lines`));
+
+  if (summary.commonFunctions.length > 0) {
+    out.push('');
+    out.push(chalk.bold.white('  Most common function names:'));
+    for (const fn of summary.commonFunctions) {
+      out.push(chalk.yellow(`    ${fn.name}${fn.count > 1 ? ` (×${fn.count})` : ''}`));
+    }
+  }
+
+  const smells: string[] = [...summary.issues];
+  if (summary.avgLines > 150) smells.push('long files on average');
+  if (summary.suspiciousNames.length > 3) smells.push('vague variable names');
+
+  if (smells.length > 0) {
+    out.push('');
+    out.push(chalk.bold.white('  Code smells detected:'));
+    for (const smell of smells) {
+      out.push(chalk.red(`    • ${smell}`));
+    }
+  }
+
+  out.push('');
+  out.push(chalk.bold.white('  Developer commentary:'));
+  out.push('');
+  for (const line of commentary.split('\n')) {
+    out.push(chalk.italic.gray(`    ${line}`));
+  }
+
+  out.push('');
+  out.push(DIVIDER);
+  return out.join('\n');
+}
+
+export function formatTherapy(fileName: string, therapy: string): string {
+  const out: string[] = [];
+
+  out.push('');
+  out.push(chalk.bold.magenta(`  Therapy session for ${fileName}`));
+  out.push(DIVIDER);
+  out.push('');
+
+  for (const line of therapy.split('\n')) {
+    if (line.trim() === '') {
+      out.push('');
+    } else {
+      out.push(chalk.white(`  ${line}`));
+    }
+  }
+
+  out.push('');
+  out.push(DIVIDER);
+  return out.join('\n');
+}
+
+export function formatSummary(metrics: FileMetrics, purpose: string): string {
+  const out: string[] = [];
+
+  out.push('');
+  out.push(chalk.bold.cyan(`  ${metrics.fileName}`));
+  out.push(DIVIDER);
+  out.push('');
+  out.push(chalk.gray(`  ${metrics.lines} lines · ${metrics.functionCount} functions · ${metrics.classCount} class${metrics.classCount !== 1 ? 'es' : ''}`));
+  out.push('');
+  out.push(chalk.white(`  main job: ${purpose.toLowerCase().replace(/\.$/, '')}`));
+  out.push('');
+
+  let verdict: string;
+  if (metrics.lines > 400 || metrics.suspiciousNames.length > 4) verdict = 'needs work.';
+  else if (metrics.lines > 200 || metrics.suspiciousNames.length > 2) verdict = 'reasonable but messy.';
+  else if (metrics.comments === 0 && metrics.lines > 50) verdict = 'functional but undocumented.';
+  else verdict = 'looks decent.';
+
+  out.push(chalk.bold.white(`  verdict: ${verdict}`));
   out.push('');
   out.push(DIVIDER);
   return out.join('\n');
