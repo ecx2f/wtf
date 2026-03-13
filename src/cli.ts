@@ -25,7 +25,7 @@ export function run(): void {
   program
     .name('wtf')
     .description('understand code the honest way.')
-    .version('1.0.0')
+    .version('1.3.0', '-v, -V, --version')
     .argument('[path]', 'file or directory to analyze')
     .option('--explain', 'structured explanation without heavy jokes')
     .option('--roast', 'full meme roast mode')
@@ -51,7 +51,7 @@ export function run(): void {
       const stat = fs.statSync(resolved);
 
       if (stat.isDirectory()) {
-        await handleDirectory(resolved, options);
+        await handleProject(options, resolved);
       } else {
         handleFile(resolved, options);
       }
@@ -79,7 +79,7 @@ export function run(): void {
     .option('--json', 'output raw JSON')
     .option('--max-files <n>', 'max files to analyze', '100')
     .action(async (options: CliOptions) => {
-      await handleProject(options);
+      await handleProject(options, process.cwd());
     });
 
   program
@@ -214,9 +214,9 @@ function handleBlame(file: string, options: CliOptions): void {
   console.log(formatBlame(blame, commentary));
 }
 
-async function handleProject(options: CliOptions): Promise<void> {
+async function handleProject(options: CliOptions, dir: string): Promise<void> {
   const maxFiles = parseInt(options.maxFiles ?? '100', 10) || 100;
-  const summary = await analyzeDirectory(process.cwd(), maxFiles);
+  const summary = await analyzeDirectory(dir, maxFiles);
 
   if (options.json) {
     console.log(formatJson(summary));
