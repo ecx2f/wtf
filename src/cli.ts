@@ -25,7 +25,7 @@ export function run(): void {
   program
     .name('wtf')
     .description('understand code the honest way.')
-    .version('1.3.0', '-v, -V, --version')
+    .version('1.3.1', '-v, --version')
     .argument('[path]', 'file or directory to analyze')
     .option('--explain', 'structured explanation without heavy jokes')
     .option('--roast', 'full meme roast mode')
